@@ -12388,7 +12388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34513a18ba71d4d6b821bc26d52ea974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _jumpForce: 5
+  _jumpForce: 4
   _target: {fileID: 1832684248}
   _physics: {fileID: 1832684251}
   _gameController: {fileID: 1448942882}
