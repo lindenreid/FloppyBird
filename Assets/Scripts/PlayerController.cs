@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown("space"))
         {
             //Debug.Log("pressed space");
+            _physics.velocity = Vector2.zero;
             _physics.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
     }
