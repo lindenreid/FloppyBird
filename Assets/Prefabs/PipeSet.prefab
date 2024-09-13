@@ -1066,7 +1066,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 1
   _target: {fileID: 5291557699560993506}
-  _originalPosition: {x: 0, y: 0, z: 0}
+  _startDistanceFromPlayer: 4
+  _spacingBetweenSets: 4.5
 --- !u!114 &9000735497828120932
 MonoBehaviour:
   m_ObjectHideFlags: 0

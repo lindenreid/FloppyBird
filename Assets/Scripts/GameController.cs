@@ -60,16 +60,16 @@ public class GameController : MonoBehaviour
         _environment = new List<MoveLeft>();
         for(int i = 0; i < _numStartPipes; i++)
         {
-            SpawnPipe();
+            SpawnPipe(i);
         }
 
         for(int i = 0; i < _numStartFloorTiles; i++)
         {
-            SpawnFloorTile();
+            SpawnFloorTile(i);
         }
     }
 
-    private void SpawnPipe ()
+    private void SpawnPipe (int placeInLine)
     {
         // Instantiate a Pipe object
         // this makes a copy of the Pipe Prefab and adds it to the scene
@@ -84,17 +84,20 @@ public class GameController : MonoBehaviour
         Assert.IsNotNull(pipe);
 
         // tell the Pipe component to get ready
-        pipe.Setup();
+        
 
-        MoveLeft ml = pipe.GetComponent<MoveLeft>();
         // check that the Pipe object has a MoveLeft component
+        MoveLeft ml = pipe.GetComponent<MoveLeft>();
         Assert.IsNotNull(ml);
 
         // add the MoveLeft component of the Pipe object to our list 
         _environment.Add(ml);
+
+        // tell the MoveLeft component to get ready
+        ml.SetInitialPosition(placeInLine);
     }
 
-    private void SpawnFloorTile ()
+    private void SpawnFloorTile (int placeInLine)
     {
         // Instantiate a floor tile object
         // Casting here works the same as it does for the Pipe above!
@@ -104,6 +107,9 @@ public class GameController : MonoBehaviour
         // & add the tile to our environment list
         Assert.IsNotNull(floorTile);
         _environment.Add(floorTile);
+
+        // tell the MoveLeft component to get ready
+        floorTile.SetInitialPosition(placeInLine);
     }
 
     private void GameOver()
