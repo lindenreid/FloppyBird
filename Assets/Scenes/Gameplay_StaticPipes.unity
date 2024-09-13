@@ -958,7 +958,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 0.007
   _target: {fileID: 1299918341}
-  _originalPosition: {x: 0, y: 0, z: 0}
+  _startDistanceFromPlayer: 2
+  _spacingBetweenSets: 1
 --- !u!1 &1448942880
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,12 +1007,12 @@ MonoBehaviour:
   _player: {fileID: 1832684249}
   _gameOverScreen: {fileID: 988993777}
   _scoreText: {fileID: 693555477}
-  _pipePrefab: {fileID: 9000735497828120932, guid: 993a6c854526e440ab387d1034a22490, type: 3}
+  _pipePrefab: {fileID: 6331545853757921904, guid: 993a6c854526e440ab387d1034a22490, type: 3}
   _floorPrefab: {fileID: 8805642537709812698, guid: 36bd32c317c2246b6b53f751e1871e4f, type: 3}
   _pipeAnchor: {fileID: 1547468289}
   _floorAnchor: {fileID: 738929173}
   _numStartPipes: 5
-  _numStartFloorTiles: 2
+  _numStartFloorTiles: 10
 --- !u!1 &1506690523
 GameObject:
   m_ObjectHideFlags: 0

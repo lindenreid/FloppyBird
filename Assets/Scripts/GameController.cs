@@ -14,7 +14,7 @@ public class GameController : MonoBehaviour
     // Prefabs for the environment pieces that the GameController will spawn
     // and keep track of
     // & references for WHERE to spawn them (anchors)
-    [SerializeField] private Pipe _pipePrefab;
+    [SerializeField] private MoveLeft _pipePrefab;
     [SerializeField] private MoveLeft _floorPrefab;
     [SerializeField] private Transform _pipeAnchor;
     [SerializeField] private Transform _floorAnchor;
@@ -28,10 +28,48 @@ public class GameController : MonoBehaviour
     // keeping track of them so that we can despawn them when they go off screen
     private List<MoveLeft> _environment;
 
-    void Start()
+    // The minimum world bounds.
+    private Vector3 GetWorldMin () =>
+                Camera.main.ScreenToWorldPoint(
+                    new Vector3(
+                        0,
+                        0,
+                        -Camera.main.transform.position.z
+                    )
+                );
+
+    private void Start()
     {
         SetupGame();
     }
+
+    private void Update ()
+    {
+        Vector3 worldMin = GetWorldMin();
+
+        // Find and kill any environment pieces (pipes or floor tiles)
+        //      that have moved past the far left of the screen.
+        // Because you can't change the contents of a List while iterating through it,
+        //      we must first create a separate list of items to remove (despawnList).
+        List<MoveLeft> despawnList = new List<MoveLeft>();
+        foreach(MoveLeft item in _environment)
+        {
+            if(item.transform.position.x + item.transform.lossyScale.x < worldMin.x)
+            {
+                despawnList.Add(item);
+            }
+        }
+
+        // Now that we're done looping through _environment,
+        //      we loop through despawnList and remove any items 
+        //      from _environment that are on this kill list.
+        foreach(MoveLeft despawnItem in despawnList)
+        {
+            _environment.Remove(despawnItem);
+            DespawnAndReplace(despawnItem);
+        }
+    }
+
 
     public void PlayerHitPipe()
     {
@@ -76,25 +114,18 @@ public class GameController : MonoBehaviour
         // also, put the Pipe under the _pipeAnchor object in the Hierarchy
 
         // Because the return type of Instantiate is Object, 
-        // but our _pipePrefab IS a Pipe (which is a MonoBehaviour, which is an Object),
-        // we can cast the result of Instantiate as Pipe
-        Pipe pipe = Instantiate(_pipePrefab, _pipeAnchor) as Pipe;
+        // but our _pipePrefab IS a MoveLeft (which is a MonoBehaviour, which is an Object),
+        // we can cast the result of Instantiate as MoveLeft
+        MoveLeft pipe = Instantiate(_pipePrefab, _pipeAnchor) as MoveLeft;
 
         // check that the instantiation completed successfully
         Assert.IsNotNull(pipe);
 
-        // tell the Pipe component to get ready
-        
-
-        // check that the Pipe object has a MoveLeft component
-        MoveLeft ml = pipe.GetComponent<MoveLeft>();
-        Assert.IsNotNull(ml);
-
         // add the MoveLeft component of the Pipe object to our list 
-        _environment.Add(ml);
+        _environment.Add(pipe);
 
         // tell the MoveLeft component to get ready
-        ml.SetInitialPosition(placeInLine);
+        pipe.SetInitialPosition(placeInLine);
     }
 
     private void SpawnFloorTile (int placeInLine)
@@ -110,6 +141,27 @@ public class GameController : MonoBehaviour
 
         // tell the MoveLeft component to get ready
         floorTile.SetInitialPosition(placeInLine);
+    }
+
+    private void DespawnAndReplace (MoveLeft moveLeft)
+    {
+        // Check the Tags set in the Inspector on this GameObject
+        //      to decide whether we need to spawn a new Pipe
+        //      or floor tile to replace it.
+        if(moveLeft.CompareTag("Pipe"))
+        {
+            SpawnPipe(_numStartPipes - 1);
+        }
+        else if(moveLeft.CompareTag("Platform"))
+        {
+            SpawnFloorTile(_numStartFloorTiles - 1);
+        } else 
+        {
+            Assert.IsTrue(false, "No valid tag set on MoveLeft object.");
+        }
+
+        // Remove this GameObject from the Scene.
+        Destroy(moveLeft.gameObject);
     }
 
     private void GameOver()
