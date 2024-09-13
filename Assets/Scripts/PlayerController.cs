@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float _jumpForce = 1.0f;
-    public Transform _target;
-    public Rigidbody2D _physics;
-    public GameController _gameController;
+    [SerializeField] private float _jumpForce = 1.0f;
+    [SerializeField] private Transform _target;
+    [SerializeField] private Rigidbody2D _physics;
+    [SerializeField] private GameController _gameController;
 
     public void Setup()
     {

@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
-    public float _speed = 1.0f;
-    public Transform _target;
-    public Vector3 _originalPosition;
+    [SerializeField] private float _speed = 1.0f;
+    [SerializeField] private Transform _target;
+    [SerializeField] private Vector3 _originalPosition;
 
     void Update()
     {
-        _target.position += Vector3.left * _speed;
+        _target.position += Vector3.left * _speed * Time.deltaTime;
     }
 
     public void Reset()
