@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour
     // References to other stuff in the Scene that the GameController
     //      will need to ... control
     [SerializeField] private PlayerController _player;
-    [SerializeField] private GameObject _gameOverScreen;
+    [SerializeField] private GameObject _gameOverScreen;  // TODO: use events
     [SerializeField] private TMP_Text _scoreText;
 
     // Prefabs for the environment pieces that the GameController will spawn
@@ -20,6 +20,13 @@ public class GameController : MonoBehaviour
     // Tuning for how fast the pipes appear
     [SerializeField] private float _pipeSpawnRate = 2.0f;
 
+    // Events for UI to hook into to respond to game happenings.
+    public delegate void IntDelegate(int x);
+    public delegate void EmptyDelegate();
+
+    public event IntDelegate PointsChanged;
+    public event EmptyDelegate GameEnded;
+
     // a list of all of the moving pieces in the game
     // keeping track of them so that we can despawn them when they go off screen
     private List<MoveLeft> _environment;
@@ -29,6 +36,9 @@ public class GameController : MonoBehaviour
 
     // Half the size of the screen, used for placing objects correctly upon spawn.
     private float _halfWorldWidth;
+
+    // Keeping track of player score.
+    private int _points;
 
     // The maximum world bounds.
     public Vector3 GetWorldMax () =>
@@ -90,10 +100,27 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void DespawnAllMoveLeft ()
+    {
+        if(_environment == null || _environment.Count == 0) return;
+
+        foreach(MoveLeft despawnItem in _environment)
+        {
+            Despawn(despawnItem);
+        }
+        _environment.Clear();
+    }
+
 
     public void PlayerHitPipe()
     {
         GameOver();
+    }
+
+    public void PlayerEarnedPoint ()
+    {
+        _points++;
+        PointsChanged?.Invoke(_points);
     }
 
     public void RestartButton ()
@@ -115,11 +142,16 @@ public class GameController : MonoBehaviour
         _player.Setup();
         _player.enabled = true;
 
+        // reset points
+        _points = 0;
+        PointsChanged?.Invoke(_points);
+
         // set up UI
         _gameOverScreen.SetActive(false);
 
         // spawn initial pipe for environment
         // keep track of all of these pieces because they're moving
+        DespawnAllMoveLeft();
         _environment = new List<MoveLeft>();
         SpawnPipe();
 
@@ -156,7 +188,9 @@ public class GameController : MonoBehaviour
 
     private void GameOver()
     {
-        _gameOverScreen.SetActive(true);
+        GameEnded?.Invoke();
+        _gameOverScreen.SetActive(true); // TODO: use events
+
         _player.enabled = false;
 
         foreach(MoveLeft m in _environment)

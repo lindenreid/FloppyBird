@@ -4,8 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Environment
-  - Pipe
+  - Point
+  - Kill
   layers:
   - Default
   - TransparentFX

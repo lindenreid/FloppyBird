@@ -25,9 +25,12 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collider)
     {
         //Debug.Log("hit " + collider.name);
-        if(collider.gameObject.CompareTag("Environment"))
+        if(collider.gameObject.CompareTag("Kill"))
         {
             _gameController.PlayerHitPipe();
+        } else if(collider.gameObject.CompareTag("Point"))
+        {
+            _gameController.PlayerEarnedPoint();
         }
     }
 }
