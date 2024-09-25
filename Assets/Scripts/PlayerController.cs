@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collider)
     {
         //Debug.Log("hit " + collider.name);
-        if(collider.gameObject.CompareTag("Pipe"))
+        if(collider.gameObject.CompareTag("Environment"))
         {
             _gameController.PlayerHitPipe();
         }

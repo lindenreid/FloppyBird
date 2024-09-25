@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 7119912429773497521}
   m_Layer: 0
   m_Name: BottomPipe
-  m_TagString: Pipe
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1030,7 +1030,7 @@ GameObject:
   - component: {fileID: 9000735497828120932}
   m_Layer: 0
   m_Name: PipeSet
-  m_TagString: Pipe
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1066,8 +1066,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 1
   _target: {fileID: 5291557699560993506}
-  _startDistanceFromPlayer: 4
-  _spacingBetweenSets: 4.5
+  _collider: {fileID: 5871298349387929712}
 --- !u!114 &9000735497828120932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2354,7 +2353,7 @@ GameObject:
   - component: {fileID: 5871298349387929712}
   m_Layer: 0
   m_Name: TopPipe
-  m_TagString: Pipe
+  m_TagString: Environment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

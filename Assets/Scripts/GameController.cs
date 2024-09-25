@@ -15,18 +15,30 @@ public class GameController : MonoBehaviour
     // and keep track of
     // & references for WHERE to spawn them (anchors)
     [SerializeField] private MoveLeft _pipePrefab;
-    [SerializeField] private MoveLeft _floorPrefab;
     [SerializeField] private Transform _pipeAnchor;
-    [SerializeField] private Transform _floorAnchor;
 
-    // the number of pipes and tiles that will spawn immediately upon game load
-    // I exposed these to the Inspector to make it super easy to tune them
-    [SerializeField] private int _numStartPipes = 5;
-    [SerializeField] private int _numStartFloorTiles = 2;
+    // Tuning for how fast the pipes appear
+    [SerializeField] private float _pipeSpawnRate = 2.0f;
 
     // a list of all of the moving pieces in the game
     // keeping track of them so that we can despawn them when they go off screen
     private List<MoveLeft> _environment;
+
+    // The countdown to spawning a new pipe set.
+    private float _pipeCountdown;
+
+    // Half the size of the screen, used for placing objects correctly upon spawn.
+    private float _halfWorldWidth;
+
+    // The maximum world bounds.
+    public Vector3 GetWorldMax () =>
+                Camera.main.ScreenToWorldPoint(
+                    new Vector3(
+                        Screen.width,
+                        Screen.height,
+                        Camera.main.transform.position.z
+                    )
+                );
 
     // The minimum world bounds.
     private Vector3 GetWorldMin () =>
@@ -47,14 +59,14 @@ public class GameController : MonoBehaviour
     {
         Vector3 worldMin = GetWorldMin();
 
-        // Find and kill any environment pieces (pipes or floor tiles)
+        // Find and kill any environment pieces
         //      that have moved past the far left of the screen.
         // Because you can't change the contents of a List while iterating through it,
         //      we must first create a separate list of items to remove (despawnList).
         List<MoveLeft> despawnList = new List<MoveLeft>();
         foreach(MoveLeft item in _environment)
         {
-            if(item.transform.position.x + item.transform.lossyScale.x < worldMin.x)
+            if(item.transform.position.x + item.transform.lossyScale.x < worldMin.x - _halfWorldWidth)
             {
                 despawnList.Add(item);
             }
@@ -66,7 +78,15 @@ public class GameController : MonoBehaviour
         foreach(MoveLeft despawnItem in despawnList)
         {
             _environment.Remove(despawnItem);
-            DespawnAndReplace(despawnItem);
+            Despawn(despawnItem);
+        }
+
+        // Spawn a new pipe every [_pipeSpawnRate] seconds.
+        _pipeCountdown -= Time.deltaTime;
+        if(_pipeCountdown <= 0.0f)
+        {
+            SpawnPipe();
+            _pipeCountdown = _pipeSpawnRate;
         }
     }
 
@@ -86,6 +106,11 @@ public class GameController : MonoBehaviour
     // and setup the UI for playing the game
     private void SetupGame()
     {
+        // cache the world size
+        // MUST do this before spawning environment!!
+        _halfWorldWidth = (GetWorldMax().x - GetWorldMin().x) / 2.0f;
+        Debug.Log("half world width: "+ _halfWorldWidth);
+
         // set up player
         _player.Setup();
         _player.enabled = true;
@@ -93,21 +118,16 @@ public class GameController : MonoBehaviour
         // set up UI
         _gameOverScreen.SetActive(false);
 
-        // spawn pipes and floor tiles for environment
+        // spawn initial pipe for environment
         // keep track of all of these pieces because they're moving
         _environment = new List<MoveLeft>();
-        for(int i = 0; i < _numStartPipes; i++)
-        {
-            SpawnPipe(i);
-        }
+        SpawnPipe();
 
-        for(int i = 0; i < _numStartFloorTiles; i++)
-        {
-            SpawnFloorTile(i);
-        }
+        // reset timers
+        _pipeCountdown = _pipeSpawnRate;
     }
 
-    private void SpawnPipe (int placeInLine)
+    private void SpawnPipe ()
     {
         // Instantiate a Pipe object
         // this makes a copy of the Pipe Prefab and adds it to the scene
@@ -125,41 +145,11 @@ public class GameController : MonoBehaviour
         _environment.Add(pipe);
 
         // tell the MoveLeft component to get ready
-        pipe.SetInitialPosition(placeInLine);
+        pipe.SetInitialPosition(_halfWorldWidth);
     }
 
-    private void SpawnFloorTile (int placeInLine)
+    private void Despawn (MoveLeft moveLeft)
     {
-        // Instantiate a floor tile object
-        // Casting here works the same as it does for the Pipe above!
-        MoveLeft floorTile = Instantiate(_floorPrefab, _floorAnchor) as MoveLeft;
-
-        // check that the instantiation completed successfully
-        // & add the tile to our environment list
-        Assert.IsNotNull(floorTile);
-        _environment.Add(floorTile);
-
-        // tell the MoveLeft component to get ready
-        floorTile.SetInitialPosition(placeInLine);
-    }
-
-    private void DespawnAndReplace (MoveLeft moveLeft)
-    {
-        // Check the Tags set in the Inspector on this GameObject
-        //      to decide whether we need to spawn a new Pipe
-        //      or floor tile to replace it.
-        if(moveLeft.CompareTag("Pipe"))
-        {
-            SpawnPipe(_numStartPipes - 1);
-        }
-        else if(moveLeft.CompareTag("Platform"))
-        {
-            SpawnFloorTile(_numStartFloorTiles - 1);
-        } else 
-        {
-            Assert.IsTrue(false, "No valid tag set on MoveLeft object.");
-        }
-
         // Remove this GameObject from the Scene.
         Destroy(moveLeft.gameObject);
     }
