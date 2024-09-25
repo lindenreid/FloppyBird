@@ -100,18 +100,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void DespawnAllMoveLeft ()
-    {
-        if(_environment == null || _environment.Count == 0) return;
-
-        foreach(MoveLeft despawnItem in _environment)
-        {
-            Despawn(despawnItem);
-        }
-        _environment.Clear();
-    }
-
-
     public void PlayerHitPipe()
     {
         GameOver();
@@ -136,7 +124,6 @@ public class GameController : MonoBehaviour
         // cache the world size
         // MUST do this before spawning environment!!
         _halfWorldWidth = (GetWorldMax().x - GetWorldMin().x) / 2.0f;
-        Debug.Log("half world width: "+ _halfWorldWidth);
 
         // set up player
         _player.Setup();
@@ -151,7 +138,7 @@ public class GameController : MonoBehaviour
 
         // spawn initial pipe for environment
         // keep track of all of these pieces because they're moving
-        DespawnAllMoveLeft();
+        DespawnAllEnvironment();
         _environment = new List<MoveLeft>();
         SpawnPipe();
 
@@ -193,9 +180,17 @@ public class GameController : MonoBehaviour
 
         _player.enabled = false;
 
-        foreach(MoveLeft m in _environment)
+        DespawnAllEnvironment();
+    }
+
+    // Clear all pipes in the Scenes and the _environment list
+    private void DespawnAllEnvironment ()
+    {
+        if(_environment == null || _environment.Count == 0) return;
+
+        foreach(MoveLeft despawnItem in _environment)
         {
-            Destroy(m.gameObject);
+            Despawn(despawnItem);
         }
         _environment.Clear();
     }
